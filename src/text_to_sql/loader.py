@@ -27,11 +27,18 @@ class Loader(ABC):
       """
 
       # save_path 디렉토리 생성
-      Path(self.save_path).mkdir(parents=True, exist_ok=True)
+      save_path_obj = Path(self.save_path)
+      save_path_obj.mkdir(parents=True, exist_ok=True)
+      
+      # 이미 데이터가 존재하는지 확인
+      if self._is_dataset_already_downloaded():
+          print(f"{self.dataset_name} dataset already exists at {self.save_path}. Skipping download.")
+          return
       
       # 1. google drive에서 zip 파일 다운로드. 이 때 zip 파일은 temporary directory에 저장됨.
       with tempfile.TemporaryDirectory() as temp_dir:
-          temp_zip_path = os.path.join(temp_dir, f"{self.dataset_name}.zip")
+          temp_zip_name = f"{self.dataset_name.replace(' ', '_')}.zip"
+          temp_zip_path = os.path.join(temp_dir, temp_zip_name)
           gdown.download(f"https://drive.google.com/uc?id={self.gdrive_id}", temp_zip_path, quiet=False)
           
           # 2. zip 파일 압축 해제
@@ -40,6 +47,16 @@ class Loader(ABC):
       
       print(f"{self.dataset_name} dataset has been successfully downloaded to {self.save_path}.")
 
+  def _is_dataset_already_downloaded(self) -> bool:
+      """
+      데이터셋이 이미 다운로드되었는지 확인합니다.
+      
+      Returns:
+          bool: 데이터셋이 이미 존재하면 True, 그렇지 않으면 False
+      """
+      # 실제 데이터셋 디렉토리가 존재하고 비어있지 않으면 다운로드된 것으로 간주
+      dataset_path = self._get_dataset_detail_path_root()
+      return dataset_path.exists() and any(dataset_path.iterdir())
 
   @abstractmethod
   def get_sqlite_database(self) -> Path:
