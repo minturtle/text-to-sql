@@ -1,1 +1,3 @@
 gdown
+datasets
+python-mecab-ko

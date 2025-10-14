@@ -7,3 +7,6 @@
 
 2. Bird-Mini-Dev
    https://github.com/bird-bench/mini_dev
+
+3. Spider-Ko
+   https://huggingface.co/datasets/huggingface-KREW/spider-ko
