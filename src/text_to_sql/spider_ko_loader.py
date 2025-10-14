@@ -29,6 +29,10 @@ class SpiderKoLoader(SpiderLoader):
         # 1. super의 download_dataset 호출
         super().download_dataset()
         
+        if self._is_spider_ko_dataset_already_downloaded():
+            print("Spider Korean 데이터셋이 이미 다운로드되었습니다. Skipping download.")
+            return
+        
         # 2. huggingface로부터 spider-ko 데이터셋 다운로드
         dataset = load_dataset(self.hf_dataset_name)
         
@@ -47,13 +51,12 @@ class SpiderKoLoader(SpiderLoader):
                 "query_toks_no_value": item["query_toks_no_value"],
                 "question": question_ko,
                 "question_toks": question_toks_ko,
-                "sql": item["sql"],
             })
 
-        with open(Path(self._get_dataset_detail_path_root(), "dev_ko.json"), "w") as f:
-            json.dump(content, f)
+        with open(Path(self._get_dataset_detail_path_root(), "dev_ko.json"), "w", encoding="utf-8") as f:
+            json.dump(content, f, indent=4, ensure_ascii=False)
 
-    def _is_dataset_already_downloaded(self) -> bool:
+    def _is_spider_ko_dataset_already_downloaded(self) -> bool:
         """
         Spider Korean 데이터셋이 이미 다운로드되었는지 확인합니다.
         """

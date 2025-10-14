@@ -80,7 +80,7 @@ class TestSpiderKoLoader:
             mock_path_exists.return_value = True
             
             # Act: _is_dataset_already_downloaded() 호출
-            result = spider_ko_loader._is_dataset_already_downloaded()
+            result = spider_ko_loader._is_spider_ko_dataset_already_downloaded()
             
             # Assert: 결과 확인
             assert result == True
@@ -101,7 +101,7 @@ class TestSpiderKoLoader:
         with patch('src.text_to_sql.spider_ko_loader.SpiderLoader._is_dataset_already_downloaded', return_value=False) as mock_super_check:
             
             # Act: _is_dataset_already_downloaded() 호출
-            result = spider_ko_loader._is_dataset_already_downloaded()
+            result = spider_ko_loader._is_spider_ko_dataset_already_downloaded()
             
             # Assert: 결과 확인
             assert result == False
@@ -123,7 +123,7 @@ class TestSpiderKoLoader:
             mock_path_exists.return_value = False  # dev_ko.json이 존재하지 않음
             
             # Act: _is_dataset_already_downloaded() 호출
-            result = spider_ko_loader._is_dataset_already_downloaded()
+            result = spider_ko_loader._is_spider_ko_dataset_already_downloaded()
             
             # Assert: 결과 확인
             assert result == False
