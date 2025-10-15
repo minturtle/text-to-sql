@@ -1,3 +1,34 @@
-.venv
-data
-*__pycache__*
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Build artifacts
+dist/
+build/
+.eggs/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project data (large datasets not for VCS)
+data/
+
+# Legacy metadata dir (ensure not re-committed)
+text_to_sql.egg-info/

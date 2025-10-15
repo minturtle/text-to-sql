@@ -1,0 +1,71 @@
+[build-system]
+requires = [
+  "setuptools>=64",
+  "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "text-to-sql"
+version = "0.1.2"
+description = "Text-to-SQL dataset loaders for Bird Mini Dev, Spider, and Spider Korean datasets"
+readme = "README.md"
+authors = [{ name = "Minseok kim", email = "kms6290@kumoh.ac.kr" }]
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+keywords = ["text-to-sql", "dataset", "spider", "bird-mini-dev", "spider-ko"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+
+# sync with requirements.txt for runtime deps
+# setuptools cannot read requirements.txt automatically under PEP 621
+# so list them explicitly
+# If you prefer, we can move them to optional-dependencies.dev/test
+# For now, include only runtime deps
+# gdown, datasets, python-mecab-ko
+
+# Note: python-mecab-ko may require system deps on Windows
+# Users will need to install separately if build fails
+
+dependencies = [
+  "gdown",
+  "datasets",
+  "python-mecab-ko",
+]
+
+[project.optional-dependencies]
+# developer extras
+dev = [
+  "pytest>=7.0.0",
+  "pytest-mock>=3.10.0",
+]
+
+[project.scripts]
+text-to-sql = "text_to_sql.cli:main"
+
+[tool.setuptools]
+# Use src layout
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.include-package-data]
+# honor MANIFEST.in for sdist; wheel picks up package_data
+true
+
+[tool.setuptools.package-data]
+# none for now
+
+[tool.setuptools.data-files]
+# none
