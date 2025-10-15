@@ -38,7 +38,17 @@ class SpiderKoLoader(SpiderLoader):
         
         # 3. 2의 데이터셋을 기반으로 dev_ko.json 생성
         content = []
+        
+        # 4. spider의 dev.json 불러오기
+        with open(Path(self._get_dataset_detail_path_root(), "dev.json"), "r", encoding="utf-8") as f:
+            dev_data = json.load(f)
 
+
+        dev_kv = {}
+        for item in dev_data:
+            dev_kv[item["query"]] = item
+
+        
         for item in dataset["validation"]:
             # 한국어 질문을 토큰화
             question_ko = item["question_ko"]
@@ -51,6 +61,7 @@ class SpiderKoLoader(SpiderLoader):
                 "query_toks_no_value": item["query_toks_no_value"],
                 "question": question_ko,
                 "question_toks": question_toks_ko,
+                "sql": dev_kv[item["query"]]["sql"]
             })
 
         with open(Path(self._get_dataset_detail_path_root(), "dev_ko.json"), "w", encoding="utf-8") as f:

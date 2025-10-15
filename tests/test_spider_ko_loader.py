@@ -28,7 +28,8 @@ class TestSpiderKoLoader:
         Assert: 다음 파이프라인이 순서대로 실행되어야 함:
         1. super의 download_dataset 호출
         2. huggingface에서 spider-ko 데이터셋 다운로드
-        3. dev_ko.json 파일 생성
+        3. dev.json 파일 읽기
+        4. dev_ko.json 파일 생성 (dev.json의 sql 정보 포함)
         """
         # Arrange: Mock 설정 및 예상 동작 정의
         mock_dataset = MagicMock()
@@ -38,16 +39,24 @@ class TestSpiderKoLoader:
                 "query": "SELECT * FROM table",
                 "query_toks": ["SELECT", "*", "FROM", "table"],
                 "query_toks_no_value": ["SELECT", "*", "FROM", "table"],
-                "question_ko": "테이블에서 모든 데이터를 조회해주세요",
-                "sql": "SELECT * FROM table"
+                "question_ko": "테이블에서 모든 데이터를 조회해주세요"
             }
         ]
         mock_dataset.__getitem__.return_value = mock_validation_data
         
+        # dev.json 데이터 모킹
+        mock_dev_data = [
+            {
+                "query": "SELECT * FROM table",
+                "sql": "SELECT * FROM table"
+            }
+        ]
+        
         with patch('src.text_to_sql.spider_ko_loader.SpiderLoader.download_dataset') as mock_super_download, \
              patch('src.text_to_sql.spider_ko_loader.load_dataset', return_value=mock_dataset) as mock_load_dataset, \
              patch('builtins.open', create=True) as mock_open, \
-             patch('json.dump') as mock_json_dump:
+             patch('json.dump') as mock_json_dump, \
+             patch('json.load', return_value=mock_dev_data) as mock_json_load:
             
             # Act: download_dataset() 호출
             spider_ko_loader.download_dataset()
@@ -60,9 +69,18 @@ class TestSpiderKoLoader:
             # 2. huggingface에서 spider-ko 데이터셋 다운로드 확인
             mock_load_dataset.assert_called_once_with(spider_ko_loader.hf_dataset_name)
             
-            # 3. dev_ko.json 파일 생성 확인
+            # 3. dev.json 파일 읽기 확인
+            mock_json_load.assert_called_once()
+            
+            # 4. dev_ko.json 파일 생성 확인 (dev.json의 sql 정보가 포함된 content로 저장)
             mock_open.assert_called_once()
             mock_json_dump.assert_called_once()
+            
+            # 5. 저장된 content에 sql 정보가 포함되었는지 확인
+            saved_content = mock_json_dump.call_args[0][0]
+            assert len(saved_content) == 1
+            assert saved_content[0]["sql"] == "SELECT * FROM table"  # dev.json에서 가져온 sql
+            assert saved_content[0]["question"] == "테이블에서 모든 데이터를 조회해주세요"  # 한국어 질문
 
     def test_is_dataset_already_downloaded(self, spider_ko_loader):
         """
